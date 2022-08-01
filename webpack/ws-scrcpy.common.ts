@@ -98,6 +98,7 @@ const front: webpack.Configuration = {
             template: path.join(PROJECT_ROOT, '/src/public/index.html'),
             inject: 'head',
         }),
+        // @ts-ignore
         new MiniCssExtractPlugin(),
     ],
     output: {

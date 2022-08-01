@@ -233,3 +233,8 @@ body.list #device_list_menu {
     font-size: larger;
     font-weight: bolder;
 }
+
+.deviceIframe {
+    width: 600px;
+    height: 1000px;
+}

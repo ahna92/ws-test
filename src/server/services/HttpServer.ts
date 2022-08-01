@@ -4,8 +4,12 @@ import path from 'path';
 import { Service } from './Service';
 import { Utils } from '../Utils';
 import express, { Express } from 'express';
+const cors = require('cors')
+
 import { Config } from '../Config';
 import { TypedEmitter } from '../../common/TypedEmitter';
+import {ControlCenter as ControlCenterAppel} from "../appl-device/services/ControlCenter";
+import {ControlCenter as ControlCenterGoogle} from "../goog-device/services/ControlCenter";
 
 const DEFAULT_STATIC_DIR = path.join(__dirname, './public');
 
@@ -72,6 +76,21 @@ export class HttpServer extends TypedEmitter<HttpServerEvents> implements Servic
 
     public async start(): Promise<void> {
         this.mainApp = express();
+
+        this.mainApp.get("/devices/:platform", cors() , (req, res) => {
+            switch (req.params.platform) {
+                case "android":
+                    res.status(200).send(JSON.stringify(ControlCenterGoogle.getInstance().getDevices()))
+                    break;
+                case "ios":
+                    res.status(200).send(JSON.stringify(ControlCenterAppel.getInstance().getDevices()))
+                    break;
+                default:
+                    res.status(404).send(JSON.stringify({message: "platform not found " + req.params.platform}))
+                    break
+            }
+        })
+
         if (HttpServer.SERVE_STATIC && HttpServer.PUBLIC_DIR) {
             this.mainApp.use(express.static(HttpServer.PUBLIC_DIR));
 

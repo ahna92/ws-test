@@ -177,6 +177,13 @@ export class DeviceTracker extends BaseDeviceTracker<GoogDeviceDescriptor, never
         const isActive = device.state === DeviceState.DEVICE;
         let hasPid = false;
         const servicesId = `device_services_${fullName}`;
+        const proxyInterfaceUrl = encodeURIComponent(DeviceTracker.createUrl(this.params, device.udid).toString());
+
+        const secure = !!this.params.secure;
+        const hostname = this.params.hostname || location.hostname;
+        const port = typeof this.params.port === 'number' ? this.params.port : secure ? 443 : 80;
+        const url = `${secure?"https":"http"}://${hostname}:${port}`
+
         const row = html`<div class="device ${isActive ? 'active' : 'not-active'}">
             <div class="device-header">
                 <div class="device-name">${device['ro.product.manufacturer']} ${device['ro.product.model']}</div>
@@ -188,6 +195,7 @@ export class DeviceTracker extends BaseDeviceTracker<GoogDeviceDescriptor, never
                 <div class="device-state" title="State: ${device.state}"></div>
             </div>
             <div id="${servicesId}" class="services"></div>
+            <div style="height: 720px; width: 500px;"><iframe style="height: 720px; width: 500px;" src="${url}#!action=stream&udid=${device.udid}&player=mse&ws=${proxyInterfaceUrl}" title="em"></iframe></div>
         </div>`.content;
         const services = row.getElementById(servicesId);
         if (!services) {
